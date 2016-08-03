@@ -11,7 +11,6 @@ module.exports = (robot) ->
       room = res.message.room
       nowTime = new Date().getTime()
       time = moment(nowTime).zone('+0800').format('YYYY-MM-DD HH:mm')
-
       message = name: name, text: text, time: time,room: room
 
       conversation.push(message)
