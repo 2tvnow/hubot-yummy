@@ -1,29 +1,26 @@
 moment = require('moment')
 
 module.exports = (robot) ->
+  robot.brain.getData
 
-    conversation=robot.brain.getData
+  robot.hear /.*/, (res) ->
+    conversation = robot.brain.get('conversation')
+    name = res.message.user.name
+    text = res.message.text
+    room = res.message.room
+    nowTime = new Date().getTime()
+    time = moment(nowTime).zone('+0800').format('YYYY-MM-DD HH:mm')
+    message = name: name, text: text, time: time, room: room
+    conversation.push(message)
+    robot.brain.set 'conversation', conversation
 
-    robot.hear /.*/, (res) ->
-      name =  res.message.user.name
-      text = res.message.text
-      room = res.message.room
-      nowTime = new Date().getTime()
-      time = moment(nowTime).zone('+0800').format('YYYY-MM-DD HH:mm')
-      message = name: name, text: text, time: time,room: room
+  robot.respond /log/i, (res) ->
+    conversation = robot.brain.get('conversation') or []
 
-      conversation.push(message)
-      robot.brain.set 'conversation',conversation
-#      conversation = robot.brain.get('conversation') or []
-#      res.send JSON.stringify(conversation)
+    logs = ""
 
-    robot.respond /log/i, (res) ->
-      conversation = robot.brain.get('conversation') or []
+    for log in conversation when log.room is res.message.room
+      test = JSON.stringify(log)
+      logs = "#{logs} #{test}\n"
 
-      logs = ""
-
-      for log in conversation when log.room is res.message.room
-        test = JSON.stringify(log)
-        logs = "#{logs} #{test}\n"
-
-      res.send logs
+    res.send logs
