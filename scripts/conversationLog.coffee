@@ -2,7 +2,7 @@ moment = require('moment')
 
 module.exports = (robot) ->
 
-    conversation=robot.brain.getData
+    conversation=robot.brain.getData or []
 
     robot.hear /.*/, (res) ->
       name =  res.message.user.name
@@ -15,11 +15,11 @@ module.exports = (robot) ->
 
       conversation.push(message)
       robot.brain.set 'conversation',conversation
-#      conversation = robot.brain.get('conversation') or {}
+#      conversation = robot.brain.get('conversation') or []
 #      res.send JSON.stringify(conversation)
 
     robot.respond /log/i, (res) ->
-      conversation = robot.brain.get('conversation') or {}
+      conversation = robot.brain.get('conversation') or []
 
       logs = ""
 
