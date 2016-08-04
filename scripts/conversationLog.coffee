@@ -5,9 +5,7 @@ module.exports = (robot) ->
 
   robot.respond /initialize database/, (res) ->
     conversation = robot.brain.get('conversation') or []
-
-    for log in conversation when log.room is res.message.room
-      i = 0
+    i = 0
     loop
       if conversation[i].room is res.message.room
         conversation[i..i] = []
