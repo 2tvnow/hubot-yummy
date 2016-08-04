@@ -50,9 +50,9 @@ module.exports = (robot) ->
     "O2",
     "建鴻那的牛肉麵",
   }
-#  if  robot.brain.get('restaurants') is null
-#    robot.brain.set 'restaurants', restaurants
+#  if robot.brain.get('restaurants') is null
   robot.brain.set 'restaurants', restaurants
+#  robot.brain.set 'restaurants', restaurants
 
   robot.respond /restaurant add ([^;]*)(; addr: ([^;]*))?(; tel: ([^;]*))?/i, (res) ->
     name = res.match[1]
