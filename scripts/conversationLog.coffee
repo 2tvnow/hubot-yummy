@@ -18,7 +18,7 @@ module.exports = (robot) ->
 #      conversation = robot.brain.get('conversation') or []
 #      res.send JSON.stringify(conversation)
 
-    robot.respond /log/i, (res) ->
+    robot.respond /log$/i, (res) ->
       conversation = robot.brain.get('conversation') or []
 
       logs = ""
@@ -28,3 +28,16 @@ module.exports = (robot) ->
         logs = "#{logs} #{test}\n"
 
       res.send logs
+
+    robot.respond /log count (.*)/i, (res) ->
+      conversation = robot.brain.get('conversation') or []
+      name = res.match[1]
+      logs = ""
+      count = 0
+
+      for log in conversation when log.room is res.message.room and log.name is name
+        test = JSON.stringify(log)
+        logs = "#{logs} #{test}\n"
+        count++
+
+      res.send logs+"count: "+count
