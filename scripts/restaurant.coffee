@@ -15,6 +15,7 @@
 
 
 module.exports = (robot) ->
+#  robot.brain.getData
   restaurants = {
     "鴻園",
     "麥當勞",
@@ -49,6 +50,8 @@ module.exports = (robot) ->
     "O2",
     "建鴻那的牛肉麵",
   }
+#  if  robot.brain.get('restaurants') is null
+#    robot.brain.set 'restaurants', restaurants
   robot.brain.set 'restaurants', restaurants
 
   robot.respond /restaurant add ([^;]*)(; addr: ([^;]*))?(; tel: ([^;]*))?/i, (res) ->

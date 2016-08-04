@@ -5,7 +5,10 @@ module.exports = (robot) ->
     robot.brain.getData
 
     robot.hear /.*/, (res) ->
-      conversation= robot.brain.get('conversation')
+      if  robot.brain.get('conversation') is null
+        conversation = []
+      else
+        conversation = robot.brain.get('conversation')
       name =  res.message.user.name
       text = res.message.text
       room = res.message.room
@@ -30,7 +33,10 @@ module.exports = (robot) ->
       res.send logs
 
     robot.respond /log count (.*)/i, (res) ->
-      conversation = robot.brain.get('conversation') or []
+      if  robot.brain.get('conversation') is null
+        conversation = []
+      else
+        conversation = robot.brain.get('conversation')
       name = res.match[1]
       logs = ""
       count = 0
@@ -43,7 +49,10 @@ module.exports = (robot) ->
       res.send logs+"count: "+count
 
     robot.respond /count (.*)/i, (res) ->
-      conversation = robot.brain.get('conversation') or []
+      if  robot.brain.get('conversation') is null
+        conversation = []
+      else
+        conversation = robot.brain.get('conversation')
       name = res.match[1]
       count = 0
 
@@ -53,7 +62,10 @@ module.exports = (robot) ->
       res.send name+": "+count
 
     robot.respond /count$/i, (res) ->
-      conversation = robot.brain.get('conversation') or []
+      if  robot.brain.get('conversation') is null
+        conversation = []
+      else
+        conversation = robot.brain.get('conversation')
       counts = {}
 
       for log in conversation when log.room is res.message.room
