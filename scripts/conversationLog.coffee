@@ -41,3 +41,27 @@ module.exports = (robot) ->
         count++
 
       res.send logs+"count: "+count
+
+    robot.respond /count (.*)/i, (res) ->
+      conversation = robot.brain.get('conversation') or []
+      name = res.match[1]
+      count = 0
+
+      for log in conversation when log.room is res.message.room and log.name is name
+        count++
+
+      res.send name+": "+count
+
+    robot.respond /count$/i, (res) ->
+      conversation = robot.brain.get('conversation') or []
+      counts = {}
+
+      for log in conversation when log.room is res.message.room
+        if !counts[log.name]
+          counts[log.name]=1
+        else
+          counts[log.name]++
+
+#        counts.push({name:log.name,count:})
+
+      res.send JSON.stringify(counts)
