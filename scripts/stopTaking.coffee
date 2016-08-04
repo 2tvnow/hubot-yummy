@@ -1,20 +1,26 @@
+moment = require('moment')
+
 module.exports = (robot) ->
-  annoyIntervalId = null
+  robot.brain.getData
 
-  robot.respond /annoy me/, (res) ->
-    if annoyIntervalId
-      res.send "AAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEIIIIIIIIHHHHHHHHHH"
-      return
+  robot.hear /.*/, (res) ->
+    conversation = robot.brain.get('conversation')
+    name = res.message.user.name
+    text = res.message.text
+    room = res.message.room
+    nowTime = new Date().getTime()
+    time = moment(nowTime).zone('+0800').format('YYYY-MM-DD HH:mm')
+    message = name: name, text: text, time: time, room: room
+    conversation.push(message)
+    robot.brain.set 'conversation', conversation
 
-    res.send "Hey, want to hear the most annoying sound in the world?"
-    annoyIntervalId = setInterval () ->
-      res.send "AAAAAAAAAAAEEEEEEEEEEEEEEEEEEEEEEEEIIIIIIIIHHHHHHHHHH"
-    , 1000
+  robot.respond /log/i, (res) ->
+    conversation = robot.brain.get('conversation') or []
 
-  robot.respond /unannoy me/, (res) ->
-    if annoyIntervalId
-      res.send "GUYS, GUYS, GUYS!"
-      clearInterval(annoyIntervalId) ->
-      annoyIntervalId = null
-    else
-      res.send "Not annoying you right now, am I?"
+    logs = ""
+
+    for log in conversation when log.room is res.message.room
+      test = JSON.stringify(log)
+      logs = "#{logs} #{test}\n"
+
+    res.send logs
