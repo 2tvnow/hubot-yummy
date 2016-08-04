@@ -1,67 +1,80 @@
 moment = require('moment')
 
 module.exports = (robot) ->
+  robot.brain.getData
 
-    robot.brain.getData
+  robot.respond /initialize database/, (res) ->
+    conversation = robot.brain.get('conversation') or []
 
-    robot.hear /.*/, (res) ->
-      conversation = robot.brain.get('conversation') or []
-      name =  res.message.user.name
-      text = res.message.text
-      room = res.message.room
-      nowTime = new Date().getTime()
-      time = moment(nowTime).zone('+0800').format('YYYY-MM-DD HH:mm')
-      message = name: name, text: text, time: time,room: room
+    for log in conversation when log.room is res.message.room
+      i = 0
+    loop
+      if conversation[i].room is res.message.room
+        conversation[i..i] = []
+      else
+        i++
+      if i >= conversation.length
+        break
+    res.reply "chat history initialized!"
 
-      conversation.push(message)
-      robot.brain.set 'conversation',conversation
-#      conversation = robot.brain.get('conversation') or []
-#      res.send JSON.stringify(conversation)
+  robot.hear /.*/, (res) ->
+    conversation = robot.brain.get('conversation') or []
+    name = res.message.user.name
+    text = res.message.text
+    room = res.message.room
+    nowTime = new Date().getTime()
+    time = moment(nowTime).zone('+0800').format('YYYY-MM-DD HH:mm')
+    message = name: name, text: text, time: time, room: room
 
-    robot.respond /log$/i, (res) ->
-      conversation = robot.brain.get('conversation') or []
+    conversation.push(message)
+    robot.brain.set 'conversation', conversation
+  #      conversation = robot.brain.get('conversation') or []
+  #      res.send JSON.stringify(conversation)
 
-      logs = ""
+  robot.respond /log$/i, (res) ->
+    conversation = robot.brain.get('conversation') or []
 
-      for log in conversation when log.room is res.message.room
-        test = JSON.stringify(log)
-        logs = "#{logs} #{test}\n"
+    logs = ""
 
-      res.send logs
+    for log in conversation when log.room is res.message.room
+      test = JSON.stringify(log)
+      logs = "#{logs} #{test}\n"
 
-    robot.respond /log count (.*)/i, (res) ->
-      conversation = robot.brain.get('conversation') or []
-      name = res.match[1]
-      logs = ""
-      count = 0
+    res.send logs
 
-      for log in conversation when log.room is res.message.room and log.name is name
-        test = JSON.stringify(log)
-        logs = "#{logs} #{test}\n"
-        count++
+  robot.respond /log count (.*)/i, (res) ->
+    conversation = robot.brain.get('conversation') or []
+    name = res.match[1]
+    logs = ""
+    count = 0
 
-      res.send logs+"count: "+count
+    for log in conversation when log.room is res.message.room and log.name is name
+      test = JSON.stringify(log)
+      logs = "#{logs} #{test}\n"
+      count++
 
-    robot.respond /count (.*)/i, (res) ->
-      conversation = robot.brain.get('conversation') or []
-      name = res.match[1]
-      count = 0
+    res.send logs + "count: " + count
 
-      for log in conversation when log.room is res.message.room and log.name is name
-        count++
+  robot.respond /count (.*)/i, (res) ->
+    conversation = robot.brain.get('conversation') or []
+    name = res.match[1]
+    count = 0
 
-      res.send name+": "+count
+    for log in conversation when log.room is res.message.room and log.name is name
+      count++
 
-    robot.respond /count$/i, (res) ->
-      conversation = robot.brain.get('conversation') or []
-      counts = {}
+    res.send name + ": " + count
 
-      for log in conversation when log.room is res.message.room
-        if !counts[log.name]
-          counts[log.name]=1
-        else
-          counts[log.name]++
+  robot.respond /count$/i, (res) ->
+    conversation = robot.brain.get('conversation') or []
+    counts = {}
 
-#        counts.push({name:log.name,count:})
+    for log in conversation when log.room is res.message.room
+      if !counts[log.name]
+        counts[log.name] = 1
+      else
+        counts[log.name]++
 
-      res.send JSON.stringify(counts)
+    #        counts.push({name:log.name,count:})
+
+    res.send JSON.stringify(counts)
