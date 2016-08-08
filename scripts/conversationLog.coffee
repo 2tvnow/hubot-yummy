@@ -83,7 +83,9 @@ module.exports = (robot) ->
 #    for log in conversation when log.room is res.message.room and log.name is name
 #      word="#{word} #{test}\n"
     cp = require "child_process"
-    cp.exec "ruby ./wordSegment.rb", (error, stdout, stderr) ->
+    cp.exec"gem install ckip_client", (error, stdout, stderr) ->
       res.send stderr
+#    cp.exec "ruby ./wordSegment.rb", (error, stdout, stderr) ->
+#      res.send stderr
 
 
