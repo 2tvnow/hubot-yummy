@@ -84,6 +84,10 @@ module.exports = (robot) ->
 #      word="#{word} #{test}\n"
     cp = require "child_process"
     cp.exec "ruby ./wordSegment.rb", (error, stdout, stderr) ->
-      res.send stdout
+      if error
+        res.send stderr
+      else
+        res.send stdout
+
 
 
