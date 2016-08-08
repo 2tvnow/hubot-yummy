@@ -12,8 +12,8 @@ module.exports = (robot) ->
    robot.hear /.*Q.Q.*/, (msg) ->
      msg.reply "＠・ω・＠"
 
-   robot.hear /.*yo.*/, (msg) ->
-     msg.send "UL請客~"
-
-   robot.hear /.*ㄟ.*/, (msg) ->
-     msg.emote "UL喝水!"
+#   robot.hear /.*yo.*/, (msg) ->
+#     msg.send "UL請客~"
+#
+#   robot.hear /.*ㄟ.*/, (msg) ->
+#     msg.emote "UL喝水!"
