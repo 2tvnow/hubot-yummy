@@ -75,15 +75,17 @@ module.exports = (robot) ->
 
     res.send JSON.stringify(counts)
 
-  robot.respond /segment/i, (res) ->
-#    conversation = robot.brain.get('conversation') or []
-#    name = res.match[1]
-#    word=""
-#
-#    for log in conversation when log.room is res.message.room and log.name is name
-#      word="#{word} #{test}\n"
+  robot.respond /segment (.*)/i, (res) ->
+    conversation = robot.brain.get('conversation') or []
+    name = res.match[1]
+    word=""
+
+    for log in conversation when log.room is res.message.room and log.name is name
+      word="#{word} #{log.text}"
+    word = word.replace(/\s+/g, "");
+
     cp = require "child_process"
-    cp.exec "ruby ./wordSegment.rb", (error, stdout, stderr) ->
+    cp.exec "ruby ./wordSegment.rb #{word}", (error, stdout, stderr) ->
       if error
         res.send stderr
       else
