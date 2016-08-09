@@ -85,7 +85,7 @@ module.exports = (robot) ->
     word = word.replace(/\s+/g, "");
 
     cp = require "child_process"
-    cp.exec "ruby ./wordSegment.rb 喵喵", (error, stdout, stderr) ->
+    cp.exec "ruby -E utf-8 ./wordSegment.rb 喵喵", (error, stdout, stderr) ->
       if error
         res.send stderr
       else
