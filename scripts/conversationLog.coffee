@@ -88,8 +88,10 @@ module.exports = (robot) ->
     cp.exec "ruby -E utf-8 ./wordSegment.rb #{word}", (error, stdout, stderr) ->
       if error
         res.send stderr
+        cp.exit()
       else
         res.send stdout
+        cp.exit()
 
 
 
