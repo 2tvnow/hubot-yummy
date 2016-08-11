@@ -83,6 +83,8 @@ module.exports = (robot) ->
     for log in conversation when log.room is res.message.room and log.name is name
       word="#{word} #{log.text}"
     word = word.replace(/\s+/g, "");
+    word = word.replace(/\(+/g, "");
+    word = word.replace(/\)+/g, "");
 
     cp = require "child_process"
     cp.exec "ruby -E utf-8 ./wordSegment.rb #{word}", (error, stdout, stderr) ->
