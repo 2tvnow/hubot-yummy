@@ -26,8 +26,7 @@
     "nconf": ">=0.7.1",
     "pb-hubot": "0.0.3",
     "redis": "^2.6.2",
-    "request": ">=2.51.0",
-    "ruby": "^0.6.1"
+    "request": ">=2.51.0"
   },
   "engines": {
     "node": "0.10.x"
