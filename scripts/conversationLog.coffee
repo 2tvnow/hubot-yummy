@@ -3,7 +3,6 @@ client = require('./redisLogIn').getClient()
 
 module.exports = (robot) ->
   robot.respond /initialize database/, (res) ->
-
     conversation = robot.brain.get('conversation') or []
     i = 0
     loop
@@ -15,11 +14,12 @@ module.exports = (robot) ->
         break
     res.reply "chat history initialized!"
 
-  robot.respond /user list/, (res) ->
-    allUser = robot.brain.users()
-    res.send JSON.stringify allUser
+#  robot.respond /user list/, (res) ->
+#    allUser = robot.brain.users()
+#    res.send JSON.stringify allUser
 
   robot.hear /.*/, (res) ->
+#    use hubot brain
     conversation = robot.brain.get('conversation') or []
     name = res.message.user.name
     text = res.message.text
@@ -31,24 +31,18 @@ module.exports = (robot) ->
     conversation.push(message)
     robot.brain.set 'conversation', conversation
 
-#    use brain above
-
-    key = "#{res.message.user.name}:#{res.message.room}"
-    counter = 0
-    client.incr "#{res.message.user.name}:log:#{res.message.room}:counter", (err, reply) =>
+#    use redis
+    key = "#{name}:log:#{room}"
+    client.incr "#{key}:counter", (err, reply) ->
       if err
         throw err
       else
         counter = "#{reply}"
-        nowTime = new Date().getTime()
-        time = moment(nowTime).zone('+0800').format('YYYY-MM-DD HH:mm')
-        key = "#{res.message.user.name}:log:#{res.message.room}"
-        client.hmset "#{key}:#{counter}", "message", res.message.text, "time", time, (err, resss) =>
+        client.hmset "#{key}:#{counter}", "message", text, "time", time, (err, resss) ->
           if err
             throw err
           else
-            word = res.message.text
-            word = word.replace(/[\s\(\)\<\>\&\|\"\'\;\`]/g, "");
+            word = text.replace(/[\s\(\)\<\>\&\|\"\'\;\`]/g, "");
             cp = require "child_process"
             cp.exec "ruby -E utf-8 ./wordSegment.rb #{word}", (error, stdout, stderr) ->
               if error
@@ -69,8 +63,6 @@ module.exports = (robot) ->
     res.send logs
 
   robot.respond /log count (.*)/i, (res) ->
-    client.get "#{res.message.user.name}:log:#{res.message.room}:counter", (err, reply)->
-      res.send
     conversation = robot.brain.get('conversation') or []
     name = res.match[1]
     logs = ""
@@ -106,33 +98,26 @@ module.exports = (robot) ->
     res.send JSON.stringify(counts)
 
   robot.respond /segment (.*)/i, (res) ->
-    conversation = robot.brain.get('conversation') or []
-    name = res.match[1]
-    word = ""
-
-    for log in conversation when log.room is res.message.room and log.name is name
-      word = "#{word} #{log.text}"
-    word = word.replace(/[\s\(\)\<\>\&\|\"\'\;\`]/g, "");
-    #    word = word.replace(/(\s+)/g, "");
-    #    word = word.replace(/(\(+)/g, "");
-    #    word = word.replace(/(\)+)/g, "");
-    #    word = word.replace(/(\>+)/g, "");
-    #    word = word.replace(/(\<+)/g, "");
-    #    word = word.replace(/(\&+)/g, "");
-    #    word = word.replace(/(\|+)/g, "");
-    #    word = word.replace(/(\"+)/g, "");
-    #    word = word.replace(/(\`+)/g, "");
-    #    word = word.replace(/(\;+)/g, "");
-    #    word = word.replace(/(\'+)/g, "");
-
-    cp = require "child_process"
-    cp.exec "ruby -E utf-8 ./wordSegment.rb #{word}", (error, stdout, stderr) ->
-      if error
-        res.send stderr
-        cp.exit()
-      else
-        res.send stdout
-        cp.exit()
+    client.get "#{res.message.user.name}:log:#{res.message.room}:counter", (err, reply) ->
+      count = "#{reply}"-1
+      client.hget "#{res.message.user.name}:log:#{res.message.room}:#{count}", "segment", (err, rep) ->
+        res.send "#{rep}"
+#    conversation = robot.brain.get('conversation') or []
+#    name = res.match[1]
+#    word = ""
+#
+#    for log in conversation when log.room is res.message.room and log.name is name
+#      word = "#{word} #{log.text}"
+#    word = word.replace(/[\s\(\)\<\>\&\|\"\'\;\`]/g, "");
+#
+#    cp = require "child_process"
+#    cp.exec "ruby -E utf-8 ./wordSegment.rb #{word}", (error, stdout, stderr) ->
+#      if error
+#        res.send stderr
+#        cp.exit()
+#      else
+#        res.send stdout
+#        cp.exit()
 
 
 

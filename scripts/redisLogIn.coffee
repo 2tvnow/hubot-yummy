@@ -1,12 +1,12 @@
 Url   = require "url"
 Redis = require "redis"
 
-TestClient=null
+Client=null
 
 module.exports.getClient = () ->
-  if TestClient
-    console.log(" TestClient has already existed")
-    return TestClient
+  if Client
+    console.log(" Client has already existed")
+    return Client
 
   redisUrl = if process.env.REDISTOGO_URL?
     redisUrlEnv = "REDISTOGO_URL"
@@ -42,5 +42,5 @@ module.exports.getClient = () ->
   client.on "connect", ->
     console.log "hubot-redis-brain: Successfully connected to Redis"
 
-  TestClient = client
-  return TestClient
+  Client = client
+  return Client

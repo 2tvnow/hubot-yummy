@@ -1,7 +1,7 @@
 client = require('./redisLogIn').getClient()
 
 module.exports = (robot) ->
-  robot.respond /save/, (res) ->
+  robot.respond /save$/, (res) ->
     res.reply "start background saving"
     client.bgsave  (err, reply) =>
       if err
