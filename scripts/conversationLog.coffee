@@ -98,9 +98,10 @@ module.exports = (robot) ->
     res.send JSON.stringify(counts)
 
   robot.respond /segment (.*)/i, (res) ->
-    client.get "#{res.message.user.name}:log:#{res.message.room}:counter", (err, reply) ->
+    name = res.match[1]
+    client.get "#{name}:log:#{res.message.room}:counter", (err, reply) ->
       count = "#{reply}"-1
-      client.hget "#{res.message.user.name}:log:#{res.message.room}:#{count}", "segment", (err, rep) ->
+      client.hget "#{name}:log:#{res.message.room}:#{count}", "segment", (err, rep) ->
         res.send "#{rep}"
 #    conversation = robot.brain.get('conversation') or []
 #    name = res.match[1]
